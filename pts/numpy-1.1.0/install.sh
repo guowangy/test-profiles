@@ -74,7 +74,7 @@ diff -Nur a/benchmarks/allpairs_distances_loops.py b/benchmarks/allpairs_distanc
  def allpairs_distances_loops(X,Y):
 diff -Nur a/benchmarks/conv.py b/benchmarks/conv.py
 --- a/benchmarks/conv.py	2016-02-18 14:21:28.000000000 +0000
-+++ b/benchmarks/conv.py	2019-11-11 11:34:41.333127161 +0000
++++ b/benchmarks/conv.py	2019-11-11 15:59:35.454861476 +0000
 @@ -2,6 +2,7 @@
  #run: conv(x,w)
  
@@ -88,15 +88,15 @@ diff -Nur a/benchmarks/conv.py b/benchmarks/conv.py
              for ii in xrange(sw[0]):
                  for jj in xrange(sw[1]):
 -                    idx = clamp(i,ii-sw[0]/2,sw[0]), clamp(j,jj-sw[0]/2,sw[0])
-+                    idx = clamp(i,ii-int(sw[0]/2),sw[0]), clamp(j,jj-int(sw[0]/2),sw[0])
++                    idx = clamp(i,ii-sw[0]//2,sw[0]), clamp(j,jj-sw[0]//2,sw[0])
                      result[i,j] += x[idx] * weights[ii,jj]
      return result
 diff -Nur a/benchmarks/diffusion.py b/benchmarks/diffusion.py
 --- a/benchmarks/diffusion.py	2016-02-18 14:21:28.000000000 +0000
-+++ b/benchmarks/diffusion.py	2019-11-06 17:00:05.219973553 +0000
++++ b/benchmarks/diffusion.py	2019-11-11 16:00:14.321858381 +0000
 @@ -1,4 +1,4 @@
 -#setup: import numpy as np;lx,ly=(2**7,2**7);u=np.zeros([lx,ly],dtype=np.double);u[lx/2,ly/2]=1000.0;tempU=np.zeros([lx,ly],dtype=np.double)
-+#setup: import numpy as np;lx,ly=(2**7,2**7);u=np.zeros([lx,ly],dtype=np.double);u[int(lx/2),int(ly/2)]=1000.0;tempU=np.zeros([lx,ly],dtype=np.double)
++#setup: import numpy as np;lx,ly=(2**7,2**7);u=np.zeros([lx,ly],dtype=np.double);u[lx//2,ly//2]=1000.0;tempU=np.zeros([lx,ly],dtype=np.double)
  #run: diffusion(u,tempU,100)
  
  #pythran export diffusion(float [][], float [][], int)
@@ -114,15 +114,15 @@ diff -Nur a/benchmarks/fft.py b/benchmarks/fft.py
  def fft(x):
 diff -Nur a/benchmarks/grayscott.py b/benchmarks/grayscott.py
 --- a/benchmarks/grayscott.py	2016-02-18 14:21:28.000000000 +0000
-+++ b/benchmarks/grayscott.py	2019-11-06 17:00:05.219973553 +0000
++++ b/benchmarks/grayscott.py	2019-11-11 16:01:33.291852093 +0000
 @@ -12,8 +12,8 @@
  
      r = 20
      u[:] = 1.0
 -    U[n/2-r:n/2+r,n/2-r:n/2+r] = 0.50
 -    V[n/2-r:n/2+r,n/2-r:n/2+r] = 0.25
-+    U[int(n/2)-r:int(n/2)+r,int(n/2)-r:int(n/2)+r] = 0.50
-+    V[int(n/2)-r:int(n/2)+r,int(n/2)-r:int(n/2)+r] = 0.25
++    U[n//2-r:n//2+r,n//2-r:n//2+r] = 0.50
++    V[n//2-r:n//2+r,n//2-r:n//2+r] = 0.25
      u += 0.15*np.random.random((n,n))
      v += 0.15*np.random.random((n,n))
  
@@ -148,13 +148,13 @@ diff -Nur a/benchmarks/hyantes.py b/benchmarks/hyantes.py
  #pythran export hyantes(float, float, float, float, float, float, int, int, float[][])
 diff -Nur a/benchmarks/local_maxima.py b/benchmarks/local_maxima.py
 --- a/benchmarks/local_maxima.py	2016-02-18 14:21:28.000000000 +0000
-+++ b/benchmarks/local_maxima.py	2019-11-06 17:00:05.219973553 +0000
++++ b/benchmarks/local_maxima.py	2019-11-11 16:01:56.048850281 +0000
 @@ -22,6 +22,6 @@
    for pos in np.ndindex(data.shape):
      myval = data[pos]
      for offset in np.ndindex(wsize):
 -      neighbor_idx = tuple(mode(p, o-w/2, w) for (p, o, w) in zip(pos, offset, wsize))
-+      neighbor_idx = tuple(mode(p, o-int(w/2), w) for (p, o, w) in zip(pos, offset, wsize))
++      neighbor_idx = tuple(mode(p, o-w//2, w) for (p, o, w) in zip(pos, offset, wsize))
        result[pos] &= (data[neighbor_idx] <= myval)
    return result
 diff -Nur a/benchmarks/pairwise.py b/benchmarks/pairwise.py
@@ -200,7 +200,6 @@ diff -Nur a/compat.py b/compat.py
 +    from builtins import range as xrange
 +else:
 +    from __builtin__ import xrange
-Binary files a/compat.pyc and b/compat.pyc differ
 diff -Nur a/run.py b/run.py
 --- a/run.py	2016-02-18 14:21:28.000000000 +0000
 +++ b/run.py	2019-11-11 11:42:37.642089231 +0000
